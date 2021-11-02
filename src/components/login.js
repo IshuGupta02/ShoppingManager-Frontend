@@ -3,6 +3,9 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Redirect } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Input from "@mui/material/Input";
+
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
@@ -44,10 +47,10 @@ function LoginPage(props) {
       });
     const res = await props.axiosInstance
       .post("http://127.0.0.1:8000/shopAPIs/admin_login", data, {
-        withCredentials: true,
         headers: {
           "X-CSRFToken": csrftoken,
         },
+        withCredentials: true,
       })
       .then((res1) => {
         props.checkLoginStatus();
@@ -58,18 +61,19 @@ function LoginPage(props) {
         return err;
       });
     console.log(res);
-    // cookies.set("sessionid", res["sessionid"]);
-    // cookies.set("csrftoken", res["csrftoken"]);
 
     if (!res.hasOwnProperty("error")) {
-      props.history.push("/cart");
+      props.history.push("/form");
     } else {
       alert(`Some error occured: ${res["error"]}`);
     }
   };
-  React.useEffect(props.checkLoginStatus, []);
+  React.useEffect(async () => {
+    await props.checkLoginStatus();
+    console.log("Login page: ", props.loginStatus);
+  }, []);
   if (props.loginStatus === true) {
-    return <Redirect to="/cart" />;
+    return <Redirect to="/form" />;
   } else {
     return (
       <div style={style}>

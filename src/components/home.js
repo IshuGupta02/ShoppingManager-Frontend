@@ -31,10 +31,11 @@ class HomePage extends React.Component {
     this.setState({ items: response });
   };
   render() {
+    console.log("Before render: ", this.props.loginStatus);
     if (this.props.loginStatus === true) {
       return <div></div>;
     } else {
-      return <Redirect to="/" />;
+      return <p>Checking login status...</p>;
     }
   }
 }
