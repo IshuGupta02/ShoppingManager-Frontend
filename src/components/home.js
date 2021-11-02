@@ -1,34 +1,42 @@
-import * as React from 'react'
-import axios from 'axios';
+import * as React from "react";
+import axios from "axios";
+import { Redirect } from "react-router-dom";
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+class HomePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { items: {} };
+    this.fetchResponse = this.fetchResponse.bind(this);
+  }
 
-class HomePage extends React.Component{
-    constructor(props)
-    {
-        super(props);
-        this.state = {
-            
-        };
-        
+  async componentDidMount() {
+    await this.props.checkLoginStatus();
+    if (this.props.loginStatus === false) {
+      this.props.history.push("/");
+    } else {
+      this.fetchResponse();
     }
-
-    async componentDidMount(){
-
-        const response= await axios({url:'http://127.0.0.1:8000/items' ,method:'POST', withCredentials:true} ).then(console.log("done"));
-           
+  }
+  fetchResponse = async () => {
+    const response = await axios({
+      url: "http://127.0.0.1:8000/items",
+      method: "POST",
+      withCredentials: true,
+    }).then((res) => {
+      console.log("done");
+      return res.data;
+    });
+    this.setState({ items: response });
+  };
+  render() {
+    if (this.props.loginStatus === true) {
+      return <div></div>;
+    } else {
+      return <Redirect to="/" />;
     }
-
-    render(){
-        return(
-            <div>
-
-            </div>
-        );
-    }
-
-
+  }
 }
 
 export default HomePage;
