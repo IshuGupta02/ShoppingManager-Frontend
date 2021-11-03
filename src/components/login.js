@@ -3,28 +3,36 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Redirect } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Input from "@mui/material/Input";
-
-import Cookies from "universal-cookie";
-const cookies = new Cookies();
+import GoogleButton from "react-google-button";
+import { style, formStyle } from "../styles/login.css.js";
+import { REACT_APP_CLIENT_ID } from "../constants/constants.js";
 
 function LoginPage(props) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const style = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100%",
-  };
-  const formStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    maxHeight: "100%",
-    width: "50%",
+
+  const openGoogleLoginPage = () => {
+    const googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+    // const redirectUri = "http://127.0.0.1:8000/accounts/google/login/callback/";
+    const redirectUri = "http://127.0.0.1:3000/google/auth/";
+
+    const scope = [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+    ].join(" ");
+
+    const params = {
+      response_type: "code",
+      client_id: REACT_APP_CLIENT_ID,
+      redirect_uri: `${redirectUri}`,
+      prompt: "select_account",
+      access_type: "offline",
+      scope,
+    };
+
+    const urlParams = new URLSearchParams(params).toString();
+
+    window.location = `${googleAuthUrl}?${urlParams}`;
   };
   const submit = async (e) => {
     console.log("submit is getting called");
@@ -110,18 +118,29 @@ function LoginPage(props) {
               justifyContent: "space-between",
             }}
           >
-            <Button type="submit" variant="contained">
+            <Button
+              type="submit"
+              variant="contained"
+              disableElevation
+              sx={{
+                padding: "10px 16px",
+                backgroundColor: "rgb(66, 133, 244)",
+                fontSize: "16px",
+                borderRadius: "0px",
+                textTransform: "none",
+                minWidth: "100px !important",
+              }}
+            >
               Log In
             </Button>
-            <Button
+            <GoogleButton
               onClick={(e) => {
                 e.preventDefault();
+                openGoogleLoginPage();
               }}
-              variant="contained"
-              color="secondary"
             >
               Authenticate with google
-            </Button>
+            </GoogleButton>
           </div>
         </form>
       </div>

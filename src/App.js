@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import LoginPage from "./components/login";
 import HomePage from "./components/home";
 import FormPage from "./components/form";
+import Authenticate from "./components/authenticate.js";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -83,6 +84,20 @@ function App(props) {
           render={(props) => {
             return (
               <LoginPage
+                {...props}
+                loginStatus={loggedIn}
+                checkLoginStatus={checkLoginStatus}
+                axiosInstance={axiosInstance}
+              />
+            );
+          }}
+        />
+        <Route
+          exact
+          path="/google/auth/"
+          render={(props) => {
+            return (
+              <Authenticate
                 {...props}
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
