@@ -1,13 +1,16 @@
 import * as React from "react";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
+import { Feed, Card } from 'semantic-ui-react'
+
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
 
 class History extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { logs: {} };
+    this.state = { logs: [] };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
 
@@ -22,12 +25,12 @@ class History extends React.Component {
 
   fetchResponse = async () => {
     const response = await axios({
-      url: "http://127.0.0.1:8000/shopAPIs/logs",
+      url: "http://127.0.0.1:8000/shopAPIs/myinfo",
       method: "GET",
       withCredentials: true,
     }).then((res) => {
         console.log(res)
-        this.setState({ logs: res.data });
+        this.setState({ logs: res.data.history_actions });
       console.log("done");
     });
 
@@ -38,10 +41,26 @@ class History extends React.Component {
   render() {
     // console.log("Before render: ", this.props.loginStatus);
     if (this.props.loginStatus === true) {
-      return <div>
+      return <Feed>
+      {
+        this.state.logs.map((log)=>{
+          return(
+           <Feed.Event key={log.id}>
+            <Feed.Label image={(JSON.parse(log.history_log)).data.image}/>
+            <Feed.Content date={(JSON.parse(log.history_log)).data.addedOn} summary={(JSON.parse(log.history_log)).info +(JSON.parse(log.history_log)).object} extraText={(JSON.parse(log.history_log)).data.title}>
 
+            </Feed.Content>
+          </Feed.Event> 
+                        
+          );
 
-      </div>;
+        }
+
+        )}
+      </Feed>;
+
+      
+      
     } else {
       return <p>Checking login status...</p>;
     }
