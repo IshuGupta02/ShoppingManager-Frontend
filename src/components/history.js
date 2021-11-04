@@ -1,7 +1,7 @@
 import * as React from "react";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
-import { Feed, Card } from 'semantic-ui-react'
+import { Feed, Card, Menu } from 'semantic-ui-react'
 
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
@@ -10,7 +10,11 @@ axios.defaults.xsrfHeaderName = "X-CSRFToken";
 class History extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { logs: [] };
+    this.state = { 
+      logs: [],
+      items:[{ key: 'name', active: true, name: 'HISTORY'}]
+    
+    };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
 
@@ -41,11 +45,15 @@ class History extends React.Component {
   render() {
     
     if (this.props.loginStatus === true) {
-      return <Feed>
+      return <div style={{width:"100vw"}}>
+
+      <Menu items={this.state.items} inverted />
+
+      <Feed size='large' className="ui divided items" style={{width:"100%" , display:"flex", flexDirection:"column", alignItems:"center"}}>
       {
         this.state.logs.map((log)=>{
           return(
-           <Feed.Event key={log.id}>
+           <Feed.Event key={log.id} style={{padding:'20px', justifyContent:"center", borderBottom:"0.05px solid black"}}>
             <Feed.Label image={(JSON.parse(log.history_log)).data.image}/>
             <Feed.Content date={(JSON.parse(log.history_log)).data.adddedOn} 
             summary={(JSON.parse(log.history_log)).info +(JSON.parse(log.history_log)).object} 
@@ -61,7 +69,8 @@ class History extends React.Component {
         }
 
         )}
-      </Feed>;
+      </Feed>
+      </div>;
 
       
       
