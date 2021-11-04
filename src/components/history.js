@@ -39,7 +39,7 @@ class History extends React.Component {
   };
 
   render() {
-    // console.log("Before render: ", this.props.loginStatus);
+    
     if (this.props.loginStatus === true) {
       return <Feed>
       {
@@ -47,7 +47,11 @@ class History extends React.Component {
           return(
            <Feed.Event key={log.id}>
             <Feed.Label image={(JSON.parse(log.history_log)).data.image}/>
-            <Feed.Content date={(JSON.parse(log.history_log)).data.addedOn} summary={(JSON.parse(log.history_log)).info +(JSON.parse(log.history_log)).object} extraText={(JSON.parse(log.history_log)).data.title}>
+            <Feed.Content date={(JSON.parse(log.history_log)).data.adddedOn} 
+            summary={(JSON.parse(log.history_log)).info +(JSON.parse(log.history_log)).object} 
+            extraText={(JSON.parse(log.history_log)).data.title}
+            // extraText={log.history_log}
+            >
 
             </Feed.Content>
           </Feed.Event> 
