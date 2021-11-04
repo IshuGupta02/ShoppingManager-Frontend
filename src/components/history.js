@@ -4,10 +4,10 @@ import { Redirect } from "react-router-dom";
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-class HomePage extends React.Component {
+class History extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { items: {} };
+    this.state = { logs: {} };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
 
@@ -19,26 +19,33 @@ class HomePage extends React.Component {
       this.fetchResponse();
     }
   }
+
   fetchResponse = async () => {
     const response = await axios({
-      url: "http://127.0.0.1:8000/shopAPIs/items",
+      url: "http://127.0.0.1:8000/shopAPIs/logs",
       method: "GET",
       withCredentials: true,
     }).then((res) => {
+        console.log(res)
+        this.setState({ logs: res.data });
       console.log("done");
-      return res.data;
     });
-    this.setState({ items: response });
-    console.log(this.state.items)
+
+    console.log(this.state.logs)
+    
   };
+
   render() {
-    console.log("Before render: ", this.props.loginStatus);
+    // console.log("Before render: ", this.props.loginStatus);
     if (this.props.loginStatus === true) {
-      return <div></div>;
+      return <div>
+
+
+      </div>;
     } else {
       return <p>Checking login status...</p>;
     }
   }
 }
 
-export default HomePage;
+export default History;
