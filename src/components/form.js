@@ -37,7 +37,7 @@ function FormPage(props) {
             method:'POST', 
             data:item , 
             withCredentials:true, 
-            headers: {"Content-Type": "application/json", 'X-CSRFToken': csrftoken }})
+            headers: {"Content-Type": "application/json", 'X-CSRFToken':csrftoken }})
             .then(
               console.log("done")
             
