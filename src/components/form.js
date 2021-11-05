@@ -14,6 +14,7 @@ function FormPage(props) {
       })
       .then((res) => {
         console.log(res.data);
+        setUrl('')
       })
       .catch((err) => {
         console.log(err);
