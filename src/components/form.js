@@ -2,62 +2,99 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Input from "@mui/material/Input";
 import Button from "@mui/material/Button";
-import Cookies from 'js-cookie';
-// import { useCookies } from 'react-cookie';
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import axios from "axios";
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function FormPage(props) {
   const [url, setUrl] = React.useState("");
-  const [item, setItem] = React.useState("");
-  const [csrftoken, setCsrftoken]= React.useState("");
-  // const [cookies, setCookie] = useCookies(['csrftoken']);
+  const [item, setItem] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [err, setErr] = React.useState("");
+  const [msg, setMsg] = React.useState("");
+  const handleClick = () => {
+    setOpen(true);
+  };
 
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   const fetchData = (e) => {
-    
     e.preventDefault();
+    if (url === "") {
+      setErr("error");
+      setMsg("Url cannot be empty!");
+      handleClick();
+      return;
+    }
     props.axiosInstance
       .get(`http://127.0.0.1:8000/shopAPIs/fetch_item?url=${url}`, {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res.data.item);
-        setItem(res.data.item)
-
-        console.log(item)
-
-        
-        props.axiosInstance.get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        if (!res.data.hasOwnProperty("error")) {
+          console.log(res.data.item);
+          setItem(res.data.item);
+        } else {
+          setErr("error");
+          setMsg(res.data.error);
+          handleClick();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setErr("error");
+        setMsg("Invalid url!");
+        handleClick();
+      });
+  };
+  React.useEffect(async () => {
+    if (item !== null && item !== undefined) {
+      await createItem();
+      handleClick();
+    }
+  }, [item]);
+  const createItem = async () => {
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/",
+            method: "POST",
+            data: item,
             withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
           })
-          .then((response) => {
-            console.log(response.data.csrftoken);
-            setCsrftoken(response.data.csrftoken);
-
-            props.axiosInstance({url:'http://127.0.0.1:8000/shopAPIs/items/' ,
-            method:'POST', 
-            data:item , 
-            withCredentials:true, 
-            headers: {"Content-Type": "application/json", 'X-CSRFToken':csrftoken }})
-            .then(
-              console.log("done")
-            
-            )
-            .catch(err => {
-                console.log(err)
-            })
-            
+          .then((res) => {
+            console.log("done");
+            setErr("success");
+            setMsg(`${res.data.title} added to your cart!`);
           })
           .catch((error) => {
-            console.log(error);
-        })
-        
+            setErr("error");
+            setMsg("Could not fetch item! Refresh or Try again...");
+          });
       })
-      .catch(err => {
-        console.log(err)
-      })
-      
+      .catch((error) => {
+        console.log(error);
+        setErr("error");
+        setMsg("Could not fetch item! Refresh or Try again...");
+      });
   };
-
   React.useEffect(async () => {
     await props.checkLoginStatus();
     if (props.loginStatus === false) {
@@ -74,6 +111,7 @@ function FormPage(props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          flexDirection: "column",
         }}
       >
         <Box
@@ -99,6 +137,24 @@ function FormPage(props) {
             Fetch
           </Button>
         </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          sx={{
+            mt: 2,
+          }}
+          onClick={(e) => {
+            props.history.push("/cart");
+          }}
+          disableElevation
+        >
+          View Cart
+        </Button>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={err} sx={{ width: "100%" }}>
+            {msg}
+          </Alert>
+        </Snackbar>
       </div>
     );
   } else {
