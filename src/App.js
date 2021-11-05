@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import LoginPage from "./components/login";
 import HomePage from "./components/home";
 import FormPage from "./components/form";
+import History from "./components/history";
 import Authenticate from "./components/authenticate.js";
 import axios from "axios";
 
@@ -50,6 +51,23 @@ function App(props) {
   return (
     <BrowserRouter>
       <Switch>
+
+      <Route
+          exact
+          path="/history"
+          render={(props) => {
+            return (
+              <History
+                {...props}
+                loginStatus={loggedIn}
+                checkLoginStatus={checkLoginStatus}
+                axiosInstance={axiosInstance}
+              />
+            );
+          }}
+        />
+
+
         <Route
           exact
           path="/cart"

@@ -10,9 +10,15 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import {InputAdornment} from '@material-ui/core';
+import SearchIcon from "@material-ui/icons/Search";
+import Select from '@mui/material/Select';
 // import {ExpandMoreIcon} from '@mui/icons-material';
 import { Redirect } from "react-router-dom";
-import { Divider, Grid } from "@mui/material";
+import { Divider, Grid, TextField } from "@mui/material";
 import './style1.css'
 
 
@@ -23,6 +29,8 @@ class HomePage extends React.Component {
     this.state = { 
       items: [],
       expanded:0,
+      filter:'a',
+      searchParam:['title','category']
     };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
@@ -38,7 +46,7 @@ class HomePage extends React.Component {
 
   fetchResponse = async () => {
     const response = await axios({
-      url: "http://127.0.0.1:8000/shopAPIs/items",
+      url: "http://127.0.0.1:8000/shopAPIs/myinfo",
       method: "GET",
       withCredentials: true,
     }).then((res) => {
@@ -46,7 +54,8 @@ class HomePage extends React.Component {
       console.log(res.data);
       return res.data;
     });
-    this.setState({ items: response });
+    this.setState({ items: response.cart_items });
+    console.log(this.state.items)
   };
 
   handleAccordionChange(id){
@@ -62,41 +71,181 @@ class HomePage extends React.Component {
     const data={
       availability_notif_enabled:!a
     }
-    // const headers={
-    //   'X-CSRFToken':
-    // }
-    this.props.axiosInstance({
-      url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
-      method: "PATCH",
-      data:data,
-      withCredentials: true,
-      // headers:headers,
-    }).then((res) => {
-      console.log("done");
-      console.log(res.data);
-      // return res.data;
-    });
-     this.fetchResponse();
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  handlePNoChange= async (id,a) =>{
+    const data={
+      price_notif_enabled:!a
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      this.fetchResponse();
+  }
+
+  handleCChange= async (id,a) =>{
+    const data={
+      category:a
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  handlePChange= async (id,a) =>{
+    const data={
+      priority:a
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   render() {
-    console.log("Before render: ", this.props.loginStatus);
+    
     if (this.props.loginStatus === true) {
+      const { filter, data, items, searchParam } = this.state;
+      const lowercasedFilter = filter.toLowerCase();
+      // const searchParam = ['title'];
+      const filteredData = items.filter(item1 => {
+        return searchParam.some((newItem) => {
+          return (
+              item1[newItem]
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(filter.toLowerCase()) > -1
+          );
+      });
+      });
       return (
-          <div>
+          <div className='flex-box'>
+            <TextField
+              sx={{alignSelf:'center'}}
+              defaultValue=''
+              placeholder='Search by name/category'
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                 )
+              }}
+              onChange={(e)=>this.setState({filter:e.target.value})}
+            />
+            {/* {JSON.stringify(filteredData)} */}
             <Grid>
             {
-              this.state.items.map((item, index)=>{
+              filteredData.map((item, index)=>{
                 return(
                   <Card className='card-display-2' key ={index}>
+                    {/* {JSON.stringify(item)} */}
                     <Box className='card-display-1'>
                     <CardMedia
                       component="img"
-                      sx={{ width: 200 }}
+                      sx={{ width: '18%' }}
                       image={item.image}
                       alt="Display Picture"
                     />
-                    <Box sx={{width:800}}>
+                    <Box sx={{width:'82%'}} className='outBox'>
                       <Box sx={{display:'flex'}} >
                         <Typography sx={{margin:'1% 0% 0% 1%'}} component="div" variant="h4">
                         <strong> {item.title} </strong> 
@@ -119,10 +268,23 @@ class HomePage extends React.Component {
                         <strong> Added-On : </strong> {item.adddedOn}
                         </Typography>
                         <Typography sx={{margin:'1% 0% 0% 1%', color:'#909090'}} component="div" variant="h5">
-                        <strong> Category : </strong> {item.category}
+                        <strong> Category : </strong> 
+                        <input className='input-1' value={item.category} onBlur={(e)=>this.handleCChange(item.id,e.target.value)}></input>
                         </Typography>
                       </Box>
-                      <Box sx={{display:'flex'}} >
+                      <Box sx={{display:'flex'}} className='box-flex' >
+                      <Typography sx={{margin:'1% 0% 0% 1%', color:'#909090'}} component="div" variant="h5">
+                        <strong> Priority : </strong>
+                        <Select
+                          value={item.priority}
+                          label="Priority"
+                          onChange={(e)=>this.handlePChange(item.id,e.target.value)}
+                        >
+                          <MenuItem value={0}>0</MenuItem>
+                          <MenuItem value={1}>1</MenuItem>
+                          <MenuItem value={2}>2</MenuItem>
+                        </Select>
+                        </Typography>
                         {item.availability_status?(
                           <Chip
                             sx={{margin:'1% 0% 0% 1%'}}
@@ -138,12 +300,35 @@ class HomePage extends React.Component {
                             clickable
                           />
                         )}
-                         <Switch
-                          checked={item.availability_notif_enabled}
-                          onChange={()=>this.handleANoChange(item.id,item.availability_notif_enabled)}
-                          inputProps={{ 'aria-label': 'Availability Notif' }}
-                          label='Availability Notif'
+                        <Box>
+                        <FormControlLabel
+                          className='switches-1'
+                          sx={{fontSize:'2em'}}
+                          control={
+                            <Switch
+                              checked={item.availability_notif_enabled}
+                              onChange={()=>this.handleANoChange(item.id,item.availability_notif_enabled)}
+                              inputProps={{ 'aria-label': 'Availability Notif' }}
+                            />
+                          }
+                          label=''
                         />
+                         Availability Notif
+                         <br></br>
+                         <FormControlLabel
+                          className='switches-1'
+                          sx={{fontSize:'2em'}}
+                          control={
+                            <Switch
+                              checked={item.price_notif_enabled}
+                              onChange={()=>this.handlePNoChange(item.id,item.price_notif_enabled)}
+                              inputProps={{ 'aria-label': 'Availability Notif' }}
+                            />
+                          }
+                          label=''
+                        />
+                         Price Notif
+                         </Box>
                       </Box>
                     </Box>
                     <Divider sx={{color:'#696362'}}></Divider>
@@ -173,7 +358,6 @@ class HomePage extends React.Component {
                       </AccordionDetails>
                     </Accordion>
                   </Card>
-                  //"availability_notif_enabled":false,"price_notif_enabled":false}
                 )
               })
             }
