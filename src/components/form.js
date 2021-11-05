@@ -6,9 +6,9 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import axios from "axios";
 
-//header-logout,view history, notif
+//header- notif
 //comment-add , del, modify
-//search-category, name, date
+//search- date
 //notif-add, del, modify
 
 const Alert = React.forwardRef(function Alert(props, ref) {

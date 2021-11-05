@@ -1,12 +1,12 @@
 .flex-box{
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     margin: 1%;
 }
 .card-display-1{
     /* margin : 2%  !important; */
     /* border : 2px solid black !important; */
-    height: 35vh !important;
+    height: 37vh !important;
     display: flex;
 }
 

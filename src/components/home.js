@@ -16,21 +16,33 @@ import FormControl from '@mui/material/FormControl';
 import {InputAdornment} from '@material-ui/core';
 import SearchIcon from "@material-ui/icons/Search";
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Modal from '@mui/material/Modal';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 // import {ExpandMoreIcon} from '@mui/icons-material';
 import { Redirect } from "react-router-dom";
 import { Divider, Grid, TextField } from "@mui/material";
 import './style1.css'
 
-
 class HomePage extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = { 
       items: [],
       expanded:0,
-      filter:'a',
-      searchParam:['title','category']
+      filter:'',
+      searchParam:['title','category'],
+      deleteId:-1,
+      open : false,
+      comment_content:'',
+      notif_content:'',
+      notif_d_id:-1,
+      comment_d_id:-1,
+      notif_e_id:-1,
+      comment_e_id:-1,
     };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
@@ -200,6 +212,246 @@ class HomePage extends React.Component {
       });
   }
 
+  handleItemDelete= async (id) =>{
+    const data={
+      deleted: true
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  addComment = async (id) =>{
+    const data={
+      comment_content: '',
+      assoc_item:id
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/comments",
+            method: "POST",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  deleteComment= async (id) =>{
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/comments/"+id+"/",
+            method: "DELETE",
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  editComment= async (id) =>{
+    const data={
+      comment_content: ''
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/comments/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  addNotif = async (id) =>{
+    const data={
+      notif_content: '',
+      assoc_item:id,
+      notif_time:''
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/notifications",
+            method: "POST",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  deleteNotif= async (id) =>{
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/notifications/"+id+"/",
+            method: "DELETE",
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  editNotif= async (id) =>{
+    const data={
+      notif_content: '',
+      notif_time:'',
+    }
+    axios
+      .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.csrftoken);
+        this.props
+          .axiosInstance({
+            url: "http://127.0.0.1:8000/shopAPIs/notifications/"+id+"/",
+            method: "PATCH",
+            data: data,
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": response.data.csrftoken,
+            },
+          })
+          .then((res) => {
+            this.fetchResponse();
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  handleLogout = async () => {
+    await axios({
+      url: "http://127.0.0.1:8000/shopAPIs/log_out",
+      method: "GET",
+      withCredentials: true,
+    }).then((res) => {
+      this.props.history.push("/");
+    }).catch((error) => {
+      console.log(error);
+      this.props.history.push("/");
+    });
+  };
+
   render() {
     
     if (this.props.loginStatus === true) {
@@ -209,29 +461,41 @@ class HomePage extends React.Component {
       const filteredData = items.filter(item1 => {
         return searchParam.some((newItem) => {
           return (
-              item1[newItem]
+              (item1[newItem]
                   .toString()
                   .toLowerCase()
-                  .indexOf(filter.toLowerCase()) > -1
+                  .indexOf(filter.toLowerCase()) > -1)&&(!item1['deleted'])
           );
       });
       });
       return (
-          <div className='flex-box'>
-            <TextField
-              sx={{alignSelf:'center'}}
-              defaultValue=''
-              placeholder='Search by name/category'
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                 )
-              }}
-              onChange={(e)=>this.setState({filter:e.target.value})}
-            />
-            {/* {JSON.stringify(filteredData)} */}
+          <div>
+            <Box className='flex-box'>
+              <Box sx={{display:'flex', width:'30%'}}>
+              <Button sx={{margin:'1%'}} href='./history'  variant="outlined"  startIcon={<HistoryIcon />}>
+                View History
+              </Button>
+              <Button sx={{margin:'1%'}} href='./notif'  variant="outlined"  startIcon={<CircleNotificationsIcon />}>
+                View Notifications
+              </Button>
+              </Box>
+              <TextField
+                sx={{alignSelf:'center'}}
+                defaultValue=''
+                placeholder='Search by Name/Category'
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  )
+                }}
+                onChange={(e)=>this.setState({filter:e.target.value})}
+              />
+              <Button sx={{margin:'1%'}} onClick={()=>this.handleLogout()}  variant="outlined" color='error' startIcon={<LogoutIcon />}>
+                Logout
+              </Button>
+            </Box>
             <Grid>
             {
               filteredData.map((item, index)=>{
@@ -246,19 +510,24 @@ class HomePage extends React.Component {
                       alt="Display Picture"
                     />
                     <Box sx={{width:'82%'}} className='outBox'>
-                      <Box sx={{display:'flex'}} >
-                        <Typography sx={{margin:'1% 0% 0% 1%'}} component="div" variant="h4">
-                        <strong> {item.title} </strong> 
-                        </Typography>
-                        <Chip
-                          sx={{alignSelf:'center',marginLeft:'2%'}}
-                          label="Visit Site"
-                          component="a"
-                          href={item.apiLink}
-                          variant="outlined"
-                          clickable
-                          color='primary'
-                        />
+                      <Box sx={{display:'flex'}}>
+                        <Box sx={{display:'flex', width:'90%'}} >
+                          <Typography sx={{margin:'1% 0% 0% 1%'}} component="div" variant="h4">
+                          <strong> {item.title} </strong> 
+                          </Typography>
+                          <Chip
+                            sx={{alignSelf:'center',marginLeft:'2%'}}
+                            label="Visit Site"
+                            component="a"
+                            href={item.apiLink}
+                            variant="outlined"
+                            clickable
+                            color='primary'
+                          />
+                        </Box>
+                        <Button sx={{margin:'1%'}} onClick={()=>this.handleItemDelete(item.id)} variant="outlined" color='error' startIcon={<DeleteIcon />}>
+                          Delete
+                        </Button>
                       </Box>
                       <Typography sx={{margin:'1% 0% 0% 1%', color:'#909090'}} component="div" variant="h5">
                        <strong> Price : </strong> Rs. {item.price}
