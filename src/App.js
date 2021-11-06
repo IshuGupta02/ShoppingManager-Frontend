@@ -7,6 +7,7 @@ import HomePage from "./components/home";
 import FormPage from "./components/form";
 import History from "./components/history";
 import Authenticate from "./components/authenticate.js";
+import Notification from "./components/notification.js";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -23,6 +24,7 @@ axiosInstance.defaults.xsrfHeaderName = "X-CSRFToken";
 
 function App(props) {
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [done, setDone] = React.useState(false);
   const checkLoginStatus = async () => {
     const response = await axios
       .get("http://127.0.0.1:8000/shopAPIs/check_login", {
@@ -43,6 +45,9 @@ function App(props) {
         console.log(err);
         return err;
       });
+    if (response.data.hasOwnProperty("loggedIn")) {
+      setDone(true);
+    }
   };
   React.useEffect(() => {
     checkLoginStatus();
@@ -51,8 +56,7 @@ function App(props) {
   return (
     <BrowserRouter>
       <Switch>
-
-      <Route
+        <Route
           exact
           path="/history"
           render={(props) => {
@@ -62,11 +66,11 @@ function App(props) {
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
                 axiosInstance={axiosInstance}
+                done={done}
               />
             );
           }}
         />
-
 
         <Route
           exact
@@ -78,6 +82,7 @@ function App(props) {
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
                 axiosInstance={axiosInstance}
+                done={done}
               />
             );
           }}
@@ -92,6 +97,22 @@ function App(props) {
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
                 axiosInstance={axiosInstance}
+                done={done}
+              />
+            );
+          }}
+        />
+        <Route
+          exact
+          path="/notif"
+          render={(props) => {
+            return (
+              <Notification
+                {...props}
+                loginStatus={loggedIn}
+                checkLoginStatus={checkLoginStatus}
+                axiosInstance={axiosInstance}
+                done={done}
               />
             );
           }}
@@ -106,6 +127,7 @@ function App(props) {
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
                 axiosInstance={axiosInstance}
+                done={done}
               />
             );
           }}
@@ -120,6 +142,7 @@ function App(props) {
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}
                 axiosInstance={axiosInstance}
+                done={done}
               />
             );
           }}
