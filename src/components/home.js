@@ -25,6 +25,12 @@ import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 // import {ExpandMoreIcon} from '@mui/icons-material';
 import { Redirect } from "react-router-dom";
 import { Divider, Grid, TextField } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import InputLabel from "@mui/material/InputLabel";
+import ButtonGroup from "@mui/material/ButtonGroup";
+
+import Moment from "react-moment";
+import moment from "moment";
 import "../styles/style1.css";
 
 class HomePage extends React.Component {
@@ -62,8 +68,8 @@ class HomePage extends React.Component {
       method: "GET",
       withCredentials: true,
     }).then((res) => {
-      console.log("done");
-      console.log(res.data);
+      // console.log("done");
+      // console.log(res.data);
       return res.data;
     });
     this.setState({ items: response.cart_items });
@@ -147,6 +153,7 @@ class HomePage extends React.Component {
   };
 
   handleCChange = async (id, a) => {
+    console.log("Patching item number,", id, a);
     const data = {
       category: a,
     };
@@ -469,12 +476,12 @@ class HomePage extends React.Component {
           );
         });
       });
+      console.log("Filtered Data is: ", filteredData);
       return (
         <div>
           <Box className="flex-box">
-            <Box sx={{ display: "flex", width: "30%" }}>
+            <ButtonGroup>
               <Button
-                sx={{ margin: "1%" }}
                 href="./history"
                 variant="outlined"
                 startIcon={<HistoryIcon />}
@@ -482,14 +489,13 @@ class HomePage extends React.Component {
                 View History
               </Button>
               <Button
-                sx={{ margin: "1%" }}
                 href="./notif"
                 variant="outlined"
                 startIcon={<CircleNotificationsIcon />}
               >
                 View Notifications
               </Button>
-            </Box>
+            </ButtonGroup>
             <TextField
               sx={{ alignSelf: "center" }}
               defaultValue=""
@@ -504,7 +510,6 @@ class HomePage extends React.Component {
               onChange={(e) => this.setState({ filter: e.target.value })}
             />
             <Button
-              sx={{ margin: "1%" }}
               onClick={() => this.handleLogout()}
               variant="outlined"
               color="error"
@@ -516,30 +521,39 @@ class HomePage extends React.Component {
           <Grid>
             {filteredData.map((item, index) => {
               return (
-                <Card className="card-display-2" key={index}>
+                <Paper className="card-display-2" key={index} elevation={3}>
                   {/* {JSON.stringify(item)} */}
                   <Box className="card-display-1">
-                    <CardMedia
-                      component="img"
-                      sx={{ width: "18%" }}
-                      image={item.image}
-                      alt="Display Picture"
-                    />
+                    <Box sx={{ width: "18%" }}>
+                      <CardMedia
+                        component="img"
+                        image={item.image}
+                        alt="Display Picture"
+                      />
+                    </Box>
+
                     <Box sx={{ width: "82%" }} className="outBox">
                       <Box sx={{ display: "flex" }}>
-                        <Box sx={{ display: "flex", width: "90%" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            width: "90%",
+                            alignItems: "center",
+                          }}
+                        >
                           <Typography
-                            sx={{ margin: "1% 0% 0% 1%" }}
+                            sx={{ ml: "1%" }}
                             component="div"
-                            variant="h4"
+                            variant="h5"
                           >
                             <strong> {item.title} </strong>
                           </Typography>
                           <Chip
-                            sx={{ alignSelf: "center", marginLeft: "2%" }}
+                            sx={{ ml: "2%" }}
                             label="Visit Site"
                             component="a"
                             href={item.apiLink}
+                            size="small"
                             variant="outlined"
                             clickable
                             color="primary"
@@ -555,55 +569,93 @@ class HomePage extends React.Component {
                           Delete
                         </Button>
                       </Box>
-                      <Typography
-                        sx={{ margin: "1% 0% 0% 1%", color: "#909090" }}
-                        component="div"
-                        variant="h5"
-                      >
-                        <strong> Price : </strong> Rs. {item.price}
-                      </Typography>
-                      <Box>
+                      <div style={{ marginLeft: "1%", marginTop: "1%" }}>
                         <Typography
-                          sx={{ margin: "1% 0% 0% 1%", color: "#909090" }}
-                          component="div"
-                          variant="h5"
+                          sx={{
+                            color: "rgb(24 29 33)",
+                            fontWeight: "bold",
+                          }}
+                          component="span"
+                          variant="h6"
                         >
-                          <strong> Added-On : </strong> {item.adddedOn}
+                          Price :&nbsp;
                         </Typography>
-                        <Typography
-                          sx={{ margin: "1% 0% 0% 1%", color: "#909090" }}
-                          component="div"
-                          variant="h5"
-                        >
-                          <strong> Category : </strong>
+                        <Typography component="span" variant="h6">
+                          Rs.&nbsp;{item.price}
+                        </Typography>
+                      </div>
+                      <Box>
+                        <div style={{ marginLeft: "1%", marginTop: "1%" }}>
+                          <Typography
+                            sx={{
+                              color: "rgb(24 29 33)",
+                              fontWeight: "bold",
+                            }}
+                            component="span"
+                            variant="h6"
+                          >
+                            Added-On:&nbsp;
+                          </Typography>
+                          <Typography component="span" variant="h6">
+                            <Moment format="MMMM Do, h:mm a">
+                              {item.adddedOn}
+                            </Moment>
+                          </Typography>
+                        </div>
+
+                        <div style={{ marginLeft: "1%", marginTop: "1%" }}>
+                          <Typography
+                            sx={{
+                              color: "rgb(24 29 33)",
+                              fontWeight: "bold",
+                            }}
+                            component="span"
+                            variant="h6"
+                          >
+                            Category:&nbsp;
+                          </Typography>
                           <input
                             className="input-1"
-                            value={item.category}
-                            onBlur={(e) =>
-                              this.handleCChange(item.id, e.target.value)
-                            }
+                            defaultValue={item.category}
+                            onBlur={(e) => {
+                              console.log(e);
+                              this.handleCChange(item.id, e.target.value);
+                            }}
                           ></input>
-                        </Typography>
+                        </div>
                       </Box>
-                      <Box sx={{ display: "flex" }} className="box-flex">
-                        <Typography
-                          sx={{ margin: "1% 0% 0% 1%", color: "#909090" }}
-                          component="div"
-                          variant="h5"
-                        >
-                          <strong> Priority : </strong>
-                          <Select
-                            value={item.priority}
-                            label="Priority"
-                            onChange={(e) =>
-                              this.handlePChange(item.id, e.target.value)
-                            }
+                      <Box
+                        sx={{ display: "flex", mt: "10px" }}
+                        className="box-flex"
+                      >
+                        <div style={{ marginLeft: "1%", marginTop: "1%" }}>
+                          <Typography
+                            sx={{
+                              color: "rgb(24 29 33)",
+                              fontWeight: "bold",
+                            }}
+                            component="span"
+                            variant="h6"
                           >
-                            <MenuItem value={0}>0</MenuItem>
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                          </Select>
-                        </Typography>
+                            Priority :&nbsp;
+                          </Typography>
+                          <Box sx={{ minWidth: 60, ml: "1%" }}>
+                            <FormControl fullWidth>
+                              <Select
+                                id="demo-simple-select"
+                                onChange={(e) =>
+                                  this.handlePChange(item.id, e.target.value)
+                                }
+                                defaultValue={item.priority}
+                              >
+                                <MenuItem value={0}>0</MenuItem>
+                                <MenuItem value={1}>1</MenuItem>
+                                <MenuItem value={2}>2</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Box>
+                        </div>
+
                         {item.availability_status ? (
                           <Chip
                             sx={{ margin: "1% 0% 0% 1%" }}
@@ -691,7 +743,7 @@ class HomePage extends React.Component {
                       {item.item_comments.length == 0 ? "No Comments" : ""}
                     </AccordionDetails>
                   </Accordion>
-                </Card>
+                </Paper>
               );
             })}
           </Grid>
