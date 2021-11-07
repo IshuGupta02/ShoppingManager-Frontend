@@ -259,6 +259,7 @@ class HomePage extends React.Component {
   handleNotificationClose = () => {
     this.setState({ curItemN: -1 });
   };
+
   handleLogout = async () => {
     await axios({
       url: "http://127.0.0.1:8000/shopAPIs/log_out",

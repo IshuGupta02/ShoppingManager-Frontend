@@ -25,6 +25,7 @@ export class NotificationComponent extends React.Component {
       notif_d_id: -1,
       notif_e_id: -1,
       add_notif: "",
+      notifs: this.props.notifications,
       notif_time: moment(new Date()).add(5, "days").format("YYYY-MM-DDTHH:mm"),
     };
   }
@@ -54,6 +55,9 @@ export class NotificationComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
+            let notifs = this.state.notifs;
+            notifs.push(res.data);
+            this.setState({ notifs: notifs });
             this.setState({ add_notif: "", notif_time: "" });
           })
           .catch((error) => {
@@ -84,6 +88,7 @@ export class NotificationComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
+            this.getNotifications();
           })
           .catch((error) => {
             console.log(error);
@@ -118,7 +123,14 @@ export class NotificationComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
-            this.setState({ add_notif: "", notif_e_id: -1, notif_time: "" });
+            this.setState({
+              add_notif: "",
+              notif_e_id: -1,
+              notif_time: moment(new Date())
+                .add(5, "days")
+                .format("YYYY-MM-DDTHH:mm"),
+            });
+            this.getNotifications();
           })
           .catch((error) => {
             console.log(error);
@@ -126,6 +138,19 @@ export class NotificationComponent extends React.Component {
       })
       .catch((error) => {
         console.log(error);
+      });
+  };
+  getNotifications = () => {
+    axios
+      .get(`/shopAPIs/item_cnot/${this.props.itemId}/`, {
+        withCredentials: true,
+      })
+      .then((resp) => {
+        console.log(resp.data);
+        this.setState({ notifs: resp.data["item_notifs"] });
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
   render() {
@@ -138,10 +163,9 @@ export class NotificationComponent extends React.Component {
         scroll={"paper"}
         onClose={this.props.handleNotificationClose}
       >
-        {" "}
         <DialogTitle id="alert-dialog-title">Notifications</DialogTitle>
         <DialogContent>
-          {this.props.notifications.map((notif) => {
+          {this.state.notifs.map((notif) => {
             return (
               <Paper elevation={2} key={notif.id} sx={{ mt: 0.5, mb: 0.5 }}>
                 <ListItem
@@ -192,7 +216,7 @@ export class NotificationComponent extends React.Component {
               </Paper>
             );
           })}
-          {this.props.notifications.length === 0 ? "No Notifications" : ""}
+          {this.state.notifs.length === 0 ? "No Notifications" : ""}
         </DialogContent>
         <DialogContent>
           <TextField
@@ -226,7 +250,6 @@ export class NotificationComponent extends React.Component {
                 )
               }
               variant="outlined"
-              disableElevation
               color="info"
               sx={{ mt: 1 }}
             >
@@ -242,7 +265,6 @@ export class NotificationComponent extends React.Component {
                 )
               }
               variant="outlined"
-              disableElevation
               color="info"
               sx={{ mt: 1 }}
             >

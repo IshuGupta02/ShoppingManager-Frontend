@@ -25,6 +25,7 @@ export class CommentComponent extends React.Component {
       comment_d_id: -1,
       comment_e_id: -1,
       add_comment: "",
+      comments: this.props.comments,
     };
   }
   addComment = async (a) => {
@@ -49,8 +50,11 @@ export class CommentComponent extends React.Component {
               "X-CSRFToken": response.data.csrftoken,
             },
           })
-          .then((res) => {
+          .then(async (res) => {
             this.props.fetchResponse();
+            let cmnts = this.state.comments;
+            cmnts.push(res.data);
+            this.setState({ comments: cmnts });
             this.setState({ add_comment: "" });
           })
           .catch((error) => {
@@ -81,6 +85,7 @@ export class CommentComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
+            this.getComments();
           })
           .catch((error) => {
             console.log(error);
@@ -90,7 +95,19 @@ export class CommentComponent extends React.Component {
         console.log(error);
       });
   };
-
+  getComments = () => {
+    axios
+      .get(`/shopAPIs/item_cnot/${this.props.itemId}/`, {
+        withCredentials: true,
+      })
+      .then((resp) => {
+        console.log(resp.data);
+        this.setState({ comments: resp.data["item_comments"] });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   editComment = async (a, id) => {
     const data = {
       comment_content: a,
@@ -114,6 +131,8 @@ export class CommentComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
+            this.getComments();
+
             this.setState({ add_comment: "", comment_e_id: -1 });
           })
           .catch((error) => {
@@ -125,107 +144,111 @@ export class CommentComponent extends React.Component {
       });
   };
   render() {
-    return (
-      <Dialog
-        open={this.props.itemId > 0}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth
-        scroll={"paper"}
-        onClose={this.props.handleCommentClose}
-      >
-        <DialogTitle id="alert-dialog-title">Comments</DialogTitle>
-        <DialogContent>
-          {this.props.comments.map((comment) => {
-            return (
-              <Paper elevation={2} key={comment.id} sx={{ mt: 0.5, mb: 0.5 }}>
-                <ListItem
-                  alignItems="flex-start"
-                  secondaryAction={
-                    <ButtonGroup>
-                      <IconButton
-                        color="success"
-                        onClick={() =>
-                          this.setState({
-                            comment_e_id: comment.id,
-                            add_comment: comment.comment_content,
-                          })
-                        }
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => this.deleteComment(comment.id)}
-                      >
-                        <DeleteForeverIcon />
-                      </IconButton>
-                    </ButtonGroup>
-                  }
-                >
-                  <ListItemText
-                    primary={comment.comment_content}
-                    secondary={
-                      <React.Fragment>
-                        <Typography
-                          sx={{ display: "inline" }}
-                          component="span"
-                          variant="body2"
-                          color="text.primary"
-                        ></Typography>
-                        {<Moment fromNow>{comment.comment_time}</Moment>}
-                      </React.Fragment>
+    if (this.state.comments !== null || this.state.comments !== undefined) {
+      return (
+        <Dialog
+          open={this.props.itemId > 0}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          fullWidth
+          scroll={"paper"}
+          onClose={this.props.handleCommentClose}
+        >
+          <DialogTitle id="alert-dialog-title">Comments</DialogTitle>
+          <DialogContent>
+            {this.state.comments.map((comment) => {
+              return (
+                <Paper elevation={2} key={comment.id} sx={{ mt: 0.5, mb: 0.5 }}>
+                  <ListItem
+                    alignItems="flex-start"
+                    secondaryAction={
+                      <ButtonGroup>
+                        <IconButton
+                          color="success"
+                          onClick={() =>
+                            this.setState({
+                              comment_e_id: comment.id,
+                              add_comment: comment.comment_content,
+                            })
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => this.deleteComment(comment.id)}
+                        >
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      </ButtonGroup>
                     }
-                  />
-                </ListItem>
-              </Paper>
-            );
-          })}
-          {this.props.comments.length === 0 ? "No Comments" : ""}
-        </DialogContent>
-        <DialogContent>
-          <TextField
-            value={this.state.add_comment}
-            onChange={(e) => this.setState({ add_comment: e.target.value })}
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Comment"
-            fullWidth
-          ></TextField>
-          {this.state.comment_e_id > -1 ? (
-            <Button
-              onClick={() =>
-                this.editComment(
-                  this.state.add_comment,
-                  this.state.comment_e_id
-                )
-              }
-              variant="outlined"
-              disableElevation
-              color="info"
-            >
-              Edit
-            </Button>
-          ) : (
-            <Button
-              onClick={() =>
-                this.addComment(this.state.add_comment, this.props.itemId)
-              }
-              variant="outlined"
-              disableElevation
-              color="info"
-            >
-              Add
-            </Button>
-          )}
-        </DialogContent>
+                  >
+                    <ListItemText
+                      primary={comment.comment_content}
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{ display: "inline" }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          ></Typography>
+                          {<Moment fromNow>{comment.comment_time}</Moment>}
+                        </React.Fragment>
+                      }
+                    />
+                  </ListItem>
+                </Paper>
+              );
+            })}
+            {this.state.comments.length === 0 ? "No Comments" : ""}
+          </DialogContent>
+          <DialogContent>
+            <TextField
+              value={this.state.add_comment}
+              onChange={(e) => this.setState({ add_comment: e.target.value })}
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Comment"
+              fullWidth
+            ></TextField>
+            {this.state.comment_e_id > -1 ? (
+              <Button
+                onClick={() =>
+                  this.editComment(
+                    this.state.add_comment,
+                    this.state.comment_e_id
+                  )
+                }
+                variant="outlined"
+                disableElevation
+                color="info"
+              >
+                Edit
+              </Button>
+            ) : (
+              <Button
+                onClick={() =>
+                  this.addComment(this.state.add_comment, this.props.itemId)
+                }
+                variant="outlined"
+                disableElevation
+                color="info"
+              >
+                Add
+              </Button>
+            )}
+          </DialogContent>
 
-        <DialogActions>
-          <Button onClick={this.props.handleCommentClose}>Close Menu</Button>
-        </DialogActions>
-      </Dialog>
-    );
+          <DialogActions>
+            <Button onClick={this.props.handleCommentClose}>Close Menu</Button>
+          </DialogActions>
+        </Dialog>
+      );
+    } else {
+      return <p>Loading comments...</p>;
+    }
   }
 }
 
