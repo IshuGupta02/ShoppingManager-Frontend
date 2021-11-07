@@ -1,13 +1,8 @@
 import * as React from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Chip from "@mui/material/Chip";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -18,27 +13,20 @@ import SearchIcon from "@material-ui/icons/Search";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Modal from "@mui/material/Modal";
 import HistoryIcon from "@mui/icons-material/History";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-// import {ExpandMoreIcon} from '@mui/icons-material';
-import { Redirect } from "react-router-dom";
 import Moment from "react-moment";
 import { Divider, Grid, TextField } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import InputLabel from "@mui/material/InputLabel";
 import ButtonGroup from "@mui/material/ButtonGroup";
-
-import moment from "moment";
 import "../styles/style1.css";
 import CommentComponent from "./itemUtils/comments.js";
 import NotificationComponent from "./itemUtils/notifications.js";
+
 class HomePage extends React.Component {
   constructor(props) {
     super(props);
@@ -51,12 +39,10 @@ class HomePage extends React.Component {
       open: false,
       comment_content: [],
       notif_content: [],
-      // notif_d_id: -1,
-      // notif_e_id: -1,
       curItemC: -1,
       curItemN: -1,
-      // add_notif: "",
-      // notif_time: "",
+      priority:-1,
+      temp:false,
     };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
@@ -277,7 +263,7 @@ class HomePage extends React.Component {
 
   render() {
     if (this.props.loginStatus === true) {
-      const { filter, data, items, searchParam } = this.state;
+      const { filter, data, items, searchParam, priority } = this.state;
       const lowercasedFilter = filter.toLowerCase();
       // const searchParam = ['title'];
       const filteredData = items.filter((item1) => {
@@ -286,7 +272,7 @@ class HomePage extends React.Component {
             item1[newItem]
               .toString()
               .toLowerCase()
-              .indexOf(filter.toLowerCase()) > -1
+              .includes(lowercasedFilter)&&(item1['priority']==priority||priority==-1)
           );
         });
       });
@@ -324,6 +310,25 @@ class HomePage extends React.Component {
                 }}
                 onChange={(e) => this.setState({ filter: e.target.value })}
               />
+              <Typography
+                sx={{ ml: "1%" , alignSelf:'center'}}
+                component="div"
+                variant="h6"
+              > Priority Filter:
+              </Typography>
+               <FormControl >
+                  <Select
+                    onChange={(e) =>
+                      {this.setState({priority:e.target.value});this.setState({temp:!this.state.temp})}
+                    }
+                    defaultValue={-1}
+                  >
+                    <MenuItem value={-1}>All</MenuItem>
+                    <MenuItem value={0}>0</MenuItem>
+                    <MenuItem value={1}>1</MenuItem>
+                    <MenuItem value={2}>2</MenuItem>
+                  </Select>
+                </FormControl>
               <Button
                 onClick={() => this.handleLogout()}
                 variant="outlined"
@@ -429,14 +434,25 @@ class HomePage extends React.Component {
                             >
                               Category:&nbsp;
                             </Typography>
-                            <input
-                              className="input-1"
-                              defaultValue={item.category}
-                              onBlur={(e) => {
-                                console.log(e);
-                                this.handleCChange(item.id, e.target.value);
-                              }}
-                            ></input>
+                            {
+                              (this.state.filter===''&&this.state.priority===-1)?(<input
+                                className="input-1"
+                                defaultValue={item.category}
+                                onBlur={(e) => {
+                                  console.log(e);
+                                  this.handleCChange(item.id, e.target.value);
+                                }}
+                              ></input>):(<Typography
+                                sx={{
+                                  color: "rgb(24 29 33)",
+                                }}
+                                component="span"
+                                variant="h6"
+                              >
+                                {item.category}
+                              </Typography>)
+                            }
+                            
                           </div>
                         </Box>
                         <Box
@@ -454,7 +470,9 @@ class HomePage extends React.Component {
                             >
                               Priority :&nbsp;
                             </Typography>
-                            <Box sx={{ minWidth: 60, ml: "1%" }}>
+                            {
+                              (this.state.filter===''&&this.state.priority===-1)?(
+                                <Box sx={{ minWidth: 60, ml: "1%" }}>
                               <FormControl fullWidth>
                                 <Select
                                   id="demo-simple-select"
@@ -469,6 +487,17 @@ class HomePage extends React.Component {
                                 </Select>
                               </FormControl>
                             </Box>
+                              ):(<Typography
+                                sx={{
+                                  color: "rgb(24 29 33)",
+                                }}
+                                component="span"
+                                variant="h6"
+                              >
+                                {item.priority}
+                              </Typography>)
+                            }
+                            
                           </div>
 
                           {item.availability_status ? (
