@@ -55,7 +55,7 @@ export class NotificationComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
-            let notifs = this.state.notifs;
+            let notifs = this.props.notifications;
             notifs.push(res.data);
             this.setState({ notifs: notifs });
             this.setState({ add_notif: "", notif_time: "" });
@@ -89,6 +89,11 @@ export class NotificationComponent extends React.Component {
           .then((res) => {
             this.props.fetchResponse();
             this.getNotifications();
+            for(let i = 0 ; i < this.props.notifications.length ; i++){
+              if(this.props.notifications[i].id===id){
+                this.props.notifications.splice(i, 1);
+              }
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -131,6 +136,13 @@ export class NotificationComponent extends React.Component {
                 .format("YYYY-MM-DDTHH:mm"),
             });
             this.getNotifications();
+            for(let i = 0 ; i < this.props.notifications.length ; i++){
+              if(this.props.notifications[i].id===id){
+                this.props.notifications.splice(i, 1);
+              }
+            }
+            let notifs = this.props.notifications;
+            notifs.push(res.data);
           })
           .catch((error) => {
             console.log(error);
@@ -165,7 +177,7 @@ export class NotificationComponent extends React.Component {
       >
         <DialogTitle id="alert-dialog-title">Notifications</DialogTitle>
         <DialogContent>
-          {this.state.notifs.map((notif) => {
+          {this.props.notifications.map((notif) => {
             return (
               <Paper elevation={2} key={notif.id} sx={{ mt: 0.5, mb: 0.5 }}>
                 <ListItem
@@ -178,7 +190,7 @@ export class NotificationComponent extends React.Component {
                           this.setState({
                             notif_e_id: notif.id,
                             add_notif: notif.notif_content,
-                            notif_time: notif.notif_time,
+                            notif_time: (notif.notif_time).substring(0,16),
                           })
                         }
                       >
@@ -216,7 +228,7 @@ export class NotificationComponent extends React.Component {
               </Paper>
             );
           })}
-          {this.state.notifs.length === 0 ? "No Notifications" : ""}
+          {this.props.notifications.length === 0 ? "No Notifications" : ""}
         </DialogContent>
         <DialogContent>
           <TextField
@@ -237,7 +249,7 @@ export class NotificationComponent extends React.Component {
             }}
             sx={{ mt: 1 }}
             value={this.state.notif_time}
-            onChange={(e) => this.setState({ notif_time: e.target.value })}
+            onChange={(e) => {this.setState({ notif_time: e.target.value });console.log(e.target.value)}}
             fullWidth
           />
           {this.state.notif_e_id > -1 ? (
@@ -273,7 +285,7 @@ export class NotificationComponent extends React.Component {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.props.handleNotificationClose}>
+          <Button onClick={()=>{this.props.handleNotificationClose();this.setState({ notifs:[]})}}>
             Close Menu
           </Button>
         </DialogActions>

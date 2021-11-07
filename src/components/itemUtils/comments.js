@@ -27,7 +27,7 @@ export class CommentComponent extends React.Component {
       add_comment: "",
       comments: this.props.comments,
     };
-  }
+  } 
   addComment = async (a) => {
     const data = {
       comment_content: a,
@@ -52,7 +52,7 @@ export class CommentComponent extends React.Component {
           })
           .then(async (res) => {
             this.props.fetchResponse();
-            let cmnts = this.state.comments;
+            let cmnts = this.props.comments;
             cmnts.push(res.data);
             this.setState({ comments: cmnts });
             this.setState({ add_comment: "" });
@@ -85,6 +85,11 @@ export class CommentComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
+            for(let i = 0 ; i < this.props.comments.length ; i++){
+              if(this.props.comments[i].id===id){
+                this.props.comments.splice(i, 1);
+              }
+            }
             this.getComments();
           })
           .catch((error) => {
@@ -95,6 +100,7 @@ export class CommentComponent extends React.Component {
         console.log(error);
       });
   };
+
   getComments = () => {
     axios
       .get(`/shopAPIs/item_cnot/${this.props.itemId}/`, {
@@ -102,12 +108,13 @@ export class CommentComponent extends React.Component {
       })
       .then((resp) => {
         console.log(resp.data);
-        this.setState({ comments: resp.data["item_comments"] });
+        this.setState({ comments: [...resp.data["item_comments"]] });
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
   editComment = async (a, id) => {
     const data = {
       comment_content: a,
@@ -132,6 +139,15 @@ export class CommentComponent extends React.Component {
           .then((res) => {
             this.props.fetchResponse();
             this.getComments();
+            for(let i = 0 ; i < this.props.comments.length ; i++){
+              if(this.props.comments[i].id===id){
+                this.props.comments.splice(i, 1);
+              }
+            }
+            let cmnts = this.props.comments;
+            cmnts.push(res.data);
+            // this.setState({ comments: cmnts });
+            this.setState({ add_comment: "" });
 
             this.setState({ add_comment: "", comment_e_id: -1 });
           })
@@ -144,6 +160,9 @@ export class CommentComponent extends React.Component {
       });
   };
   render() {
+    
+    {console.log(this.state.comments,this.props.comments)}
+    {console.log(this.state.comments,this.props.comments)}
     if (this.state.comments !== null || this.state.comments !== undefined) {
       return (
         <Dialog
@@ -153,10 +172,10 @@ export class CommentComponent extends React.Component {
           fullWidth
           scroll={"paper"}
           onClose={this.props.handleCommentClose}
-        >
+        > 
           <DialogTitle id="alert-dialog-title">Comments</DialogTitle>
-          <DialogContent>
-            {this.state.comments.map((comment) => {
+            <DialogContent>
+            {this.props.comments.map((comment) => {
               return (
                 <Paper elevation={2} key={comment.id} sx={{ mt: 0.5, mb: 0.5 }}>
                   <ListItem
@@ -200,9 +219,10 @@ export class CommentComponent extends React.Component {
                   </ListItem>
                 </Paper>
               );
-            })}
-            {this.state.comments.length === 0 ? "No Comments" : ""}
-          </DialogContent>
+            })}</DialogContent>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {this.props.comments.length === 0 ? "No Comments" : ""}
+          
           <DialogContent>
             <TextField
               value={this.state.add_comment}
@@ -242,7 +262,7 @@ export class CommentComponent extends React.Component {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={this.props.handleCommentClose}>Close Menu</Button>
+            <Button onClick={()=>{this.props.handleCommentClose()}}>Close Menu</Button>
           </DialogActions>
         </Dialog>
       );
