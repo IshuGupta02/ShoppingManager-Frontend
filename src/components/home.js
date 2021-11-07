@@ -15,40 +15,53 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { InputAdornment } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import Select from "@mui/material/Select";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Modal from "@mui/material/Modal";
-import HistoryIcon from "@mui/icons-material/History";
-import LogoutIcon from "@mui/icons-material/Logout";
-import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
+import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Modal from '@mui/material/Modal';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 // import {ExpandMoreIcon} from '@mui/icons-material';
 import { Redirect } from "react-router-dom";
+// import Moment from 'react-moment';
 import { Divider, Grid, TextField } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import InputLabel from "@mui/material/InputLabel";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
 import Moment from "react-moment";
-import moment from "moment";
+// import moment from "moment";
 import "../styles/style1.css";
+
+
 
 class HomePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       items: [],
-      expanded: 0,
-      filter: "",
-      searchParam: ["title", "category"],
-      deleteId: -1,
-      open: false,
-      comment_content: "",
-      notif_content: "",
-      notif_d_id: -1,
-      comment_d_id: -1,
-      notif_e_id: -1,
-      comment_e_id: -1,
+      expanded:0,
+      filter:'',
+      searchParam:['title','category'],
+      deleteId:-1,
+      open : false,
+      comment_content:[],
+      notif_content:[],
+      notif_d_id:-1,
+      comment_d_id:-1,
+      notif_e_id:-1,
+      comment_e_id:-1,
+      curItemC:-1,
+      curItemN:-1,
+      add_comment:'',
+      add_notif:'',
+      notif_time:''
     };
     this.fetchResponse = this.fetchResponse.bind(this);
   }
@@ -219,10 +232,7 @@ class HomePage extends React.Component {
       });
   };
 
-  handleItemDelete = async (id) => {
-    const data = {
-      deleted: true,
-    };
+  handleItemDelete= async (id) =>{
     axios
       .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
         withCredentials: true,
@@ -231,9 +241,8 @@ class HomePage extends React.Component {
         console.log(response.data.csrftoken);
         this.props
           .axiosInstance({
-            url: "http://127.0.0.1:8000/shopAPIs/items/" + id + "/",
-            method: "PATCH",
-            data: data,
+            url: "http://127.0.0.1:8000/shopAPIs/items/"+id+"/",
+            method: "DELETE",
             withCredentials: true,
             headers: {
               "Content-Type": "application/json",
@@ -241,6 +250,7 @@ class HomePage extends React.Component {
             },
           })
           .then((res) => {
+            this.setState({deleteId:-1})
             this.fetchResponse();
           })
           .catch((error) => {
@@ -252,11 +262,11 @@ class HomePage extends React.Component {
       });
   };
 
-  addComment = async (id) => {
-    const data = {
-      comment_content: "",
-      assoc_item: id,
-    };
+  addComment = async (a,id) =>{
+    const data={
+      comment_content:a,
+      assoc_item:id
+    }
     axios
       .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
         withCredentials: true,
@@ -265,7 +275,7 @@ class HomePage extends React.Component {
         console.log(response.data.csrftoken);
         this.props
           .axiosInstance({
-            url: "http://127.0.0.1:8000/shopAPIs/comments",
+            url: "http://127.0.0.1:8000/shopAPIs/comments/",
             method: "POST",
             data: data,
             withCredentials: true,
@@ -276,6 +286,7 @@ class HomePage extends React.Component {
           })
           .then((res) => {
             this.fetchResponse();
+            this.setState({add_comment:''})
           })
           .catch((error) => {
             console.log(error);
@@ -315,10 +326,10 @@ class HomePage extends React.Component {
       });
   };
 
-  editComment = async (id) => {
-    const data = {
-      comment_content: "",
-    };
+  editComment= async (a,id) =>{
+    const data={
+      comment_content: a
+    }
     axios
       .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
         withCredentials: true,
@@ -338,6 +349,7 @@ class HomePage extends React.Component {
           })
           .then((res) => {
             this.fetchResponse();
+            this.setState({add_comment:'',comment_e_id:-1})
           })
           .catch((error) => {
             console.log(error);
@@ -348,12 +360,13 @@ class HomePage extends React.Component {
       });
   };
 
-  addNotif = async (id) => {
-    const data = {
-      notif_content: "",
-      assoc_item: id,
-      notif_time: "",
-    };
+  addNotif = async (a,t,id) =>{
+    console.log(t)
+    const data={
+      notif_content: a,
+      assoc_item:id,
+      notif_time:t
+    }
     axios
       .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
         withCredentials: true,
@@ -362,7 +375,7 @@ class HomePage extends React.Component {
         console.log(response.data.csrftoken);
         this.props
           .axiosInstance({
-            url: "http://127.0.0.1:8000/shopAPIs/notifications",
+            url: "http://127.0.0.1:8000/shopAPIs/notifications/",
             method: "POST",
             data: data,
             withCredentials: true,
@@ -373,6 +386,7 @@ class HomePage extends React.Component {
           })
           .then((res) => {
             this.fetchResponse();
+            this.setState({add_notif:'',notif_time:''})
           })
           .catch((error) => {
             console.log(error);
@@ -412,11 +426,11 @@ class HomePage extends React.Component {
       });
   };
 
-  editNotif = async (id) => {
-    const data = {
-      notif_content: "",
-      notif_time: "",
-    };
+  editNotif= async (a,t,id) =>{
+    const data={
+      notif_content: a,
+      notif_time:t,
+    }
     axios
       .get("http://127.0.0.1:8000/shopAPIs/csrf_token", {
         withCredentials: true,
@@ -436,6 +450,7 @@ class HomePage extends React.Component {
           })
           .then((res) => {
             this.fetchResponse();
+            this.setState({add_notif:'',notif_e_id:-1,notif_time:''})
           })
           .catch((error) => {
             console.log(error);
@@ -469,23 +484,126 @@ class HomePage extends React.Component {
       const filteredData = items.filter((item1) => {
         return searchParam.some((newItem) => {
           return (
-            item1[newItem]
-              .toString()
-              .toLowerCase()
-              .indexOf(filter.toLowerCase()) > -1 && !item1["deleted"]
+              (item1[newItem]
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(filter.toLowerCase()) > -1)
           );
         });
       });
       console.log("Filtered Data is: ", filteredData);
       return (
-        <div>
-          <Box className="flex-box">
+          <div>
+            <Dialog
+                open={this.state.deleteId>0}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            > <DialogTitle id="alert-dialog-title">
+              {"Are you sure you want to delete the item?"}
+              </DialogTitle>
+              <DialogActions>
+                <Button onClick={()=>this.setState({deleteId:-1})}>Disagree</Button>
+                <Button onClick={()=>this.handleItemDelete(this.state.deleteId)}autoFocus>
+                  Agree
+                </Button>
+              </DialogActions>
+            </Dialog>
+             {/* comment_content:[],
+            notif_content:[],
+            notif_d_id:-1,
+            comment_d_id:-1,
+            notif_e_id:-1,
+            comment_e_id:-1,
+            curItem:-1, */}
+            <Dialog
+                open={this.state.curItemN>0}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            > <DialogTitle id="alert-dialog-title">
+                Notifications
+              </DialogTitle>
+              <DialogContent>
+                {
+                  this.state.notif_content.map((notif)=>{
+                    return(
+                      <DialogContentText id="alert-dialog-description">
+                        {notif.notif_content},
+                        <Moment format="YYYY/MM/DD">
+                        {notif.notif_time}
+                      </Moment>
+                      <Button color='error' onClick={()=>this.deleteNotif(notif.id)}>Delete</Button>
+                      <Button color='success' onClick={()=>this.setState({notif_e_id:notif.id,add_notif:notif.notif_content,notif_time:notif.notif_time})}>Edit</Button>
+                      </DialogContentText>
+                    )
+                  })
+                }
+                {this.state.notif_content.length==0?('No Notifications'):('')}
+              </DialogContent>
+             
+              <TextField value={this.state.add_notif} onChange={(e)=>this.setState({add_notif:e.target.value})}>
+              </TextField>
+              <TextField
+                  id="datetime-local"
+                  label="Due-Date"
+                  type="datetime-local"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  value={this.state.notif_time}
+                  variant="outlined"
+                  color="secondary"
+                  style={{ width: 400 }}
+                  onChange={(e)=>this.setState({notif_time:e.target.value})}
+                />
+              {this.state.notif_e_id>-1?(
+              <Button onClick={()=>this.editNotif(this.state.add_notif,this.state.notif_time,this.state.notif_e_id)}>Edit</Button>
+              ):(
+              <Button onClick={()=>this.addNotif(this.state.add_notif,this.state.notif_time,this.state.curItemN)}>Add</Button>
+              )}
+              <DialogActions>
+                <Button onClick={()=>this.setState({curItemN:-1})}>Close Menu</Button>
+              </DialogActions>
+            </Dialog>
+            <Dialog
+                open={this.state.curItemC>0}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            > <DialogTitle id="alert-dialog-title">
+                Comments
+              </DialogTitle>
+              <DialogContent>
+                {
+                  this.state.comment_content.map((comment)=>{
+                    return(
+                      <DialogContentText id="alert-dialog-description">
+                        {comment.comment_content},
+                        <Moment fromNow>
+                        {comment.comment_time}
+                      </Moment>
+                      <Button color='error' onClick={()=>this.deleteComment(comment.id)}>Delete</Button>
+                      <Button color='success' onClick={()=>this.setState({comment_e_id:comment.id,add_comment:comment.comment_content})}>Edit</Button>
+                      </DialogContentText>
+                    )
+                  })
+                }
+                {this.state.comment_content.length==0?('No Comments'):('')}
+              </DialogContent>
+             
+              <TextField value={this.state.add_comment} onChange={(e)=>this.setState({add_comment:e.target.value})}>
+              </TextField>
+              {this.state.comment_e_id>-1?(
+              <Button onClick={()=>this.editComment(this.state.add_comment,this.state.comment_e_id)}>Edit</Button>
+              ):(
+              <Button onClick={()=>this.addComment(this.state.add_comment,this.state.curItemC)}>Add</Button>
+              )}
+              <DialogActions>
+                <Button onClick={()=>this.setState({curItemC:-1})}>Close Menu</Button>
+              </DialogActions>
+            </Dialog>
+            <Box className='flex-box'>
             <ButtonGroup>
-              <Button
-                href="./history"
-                variant="outlined"
-                startIcon={<HistoryIcon />}
-              >
+              {/* <Box sx={{display:'flex', width:'30%'}}> */}
+              <Button sx={{margin:'1%'}} href='./history'  variant="outlined"  startIcon={<HistoryIcon />}>
                 View History
               </Button>
               <Button
@@ -559,13 +677,7 @@ class HomePage extends React.Component {
                             color="primary"
                           />
                         </Box>
-                        <Button
-                          sx={{ margin: "1%" }}
-                          onClick={() => this.handleItemDelete(item.id)}
-                          variant="outlined"
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                        >
+                        <Button sx={{margin:'1%'}} onClick={()=>this.setState({deleteId:item.id})} variant="outlined" color='error' startIcon={<DeleteIcon />}>
                           Delete
                         </Button>
                       </Box>
@@ -716,38 +828,18 @@ class HomePage extends React.Component {
                         </Box>
                       </Box>
                     </Box>
-                    <Divider sx={{ color: "#696362" }}></Divider>
-                  </Box>
-                  {/* {this.state.expanded} */}
-                  <Accordion
-                    expanded={this.state.expanded === item.id}
-                    onChange={() => this.handleAccordionChange(item.id)}
-                  >
-                    <AccordionSummary
-                      // expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1bh-content"
-                      id="panel1bh-header"
-                    >
-                      <Typography
-                        sx={{ color: "#636363" }}
-                        component="div"
-                        variant="h6"
-                      >
-                        <strong>Comments</strong>
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {item.item_comments.map((comment, index) => {
-                        return <Typography key={index}>{comment}</Typography>;
-                      })}
-                      {item.item_comments.length == 0 ? "No Comments" : ""}
-                    </AccordionDetails>
-                  </Accordion>
-                </Paper>
-              );
-            })}
-          </Grid>
-        </div>
+                    <Divider sx={{color:'#696362'}}></Divider>
+                    </Box>
+                    {/* {this.state.expanded} */}
+                    <Button onClick={()=>this.setState({curItemC:item.id,comment_content:item.item_comments})}>Comments</Button>
+                    <Button onClick={()=>this.setState({curItemN:item.id,notif_content:item.item_notifs})}>Notifications</Button>
+                    
+                  </Paper>
+                )
+              })
+            }
+            </Grid>
+          </div>
       );
     } else {
       return <p>Checking login status...</p>;
