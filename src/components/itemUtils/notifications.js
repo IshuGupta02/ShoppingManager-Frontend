@@ -58,7 +58,12 @@ export class NotificationComponent extends React.Component {
             let notifs = this.props.notifications;
             notifs.push(res.data);
             this.setState({ notifs: notifs });
-            this.setState({ add_notif: "", notif_time: "" });
+            this.setState({
+              add_notif: "",
+              notif_time: moment(new Date())
+                .add(5, "days")
+                .format("YYYY-MM-DDTHH:mm"),
+            });
           })
           .catch((error) => {
             console.log(error);
