@@ -12,6 +12,17 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import axios from "axios";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import { InputAdornment } from "@material-ui/core";
+import SearchIcon from "@material-ui/icons/Search";
+import HistoryIcon from "@mui/icons-material/History";
+import LogoutIcon from "@mui/icons-material/Logout";
+import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
+import { TextField } from "@mui/material";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import ClearIcon from "@mui/icons-material/Clear";
+// import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Button from "@mui/material/Button";
 
 function Notification(props) {
   const [page, setPage] = React.useState(1);
@@ -52,7 +63,38 @@ function Notification(props) {
 
   if (props.loginStatus === true) {
     return (
-      <Container>
+      <div style={{width:'100vw'}}>
+      <Box className="flex-box">
+            <ButtonGroup>
+              <Button
+                href="./notif"
+                variant="outlined"
+                basic
+                startIcon={<CircleNotificationsIcon />}
+              >
+                View Notifications
+              </Button>
+              <Button
+                href="./cart"
+                variant="outlined"
+                basic
+                startIcon={<ShoppingCartIcon />}
+              >
+                View cart
+              </Button>
+            </ButtonGroup>
+
+            <Button
+              onClick={() => this.handleLogout()}
+              variant="outlined"
+              color="error"
+              startIcon={<LogoutIcon />}
+            >
+              Logout
+            </Button>
+          </Box>
+
+          <Container>
         {notifs !== null ? (
           !checkingNotifs ? (
             notifs.map((notif, index) => {
@@ -105,6 +147,9 @@ function Notification(props) {
         )}
         <Pagination count={count} page={page} onChange={handleChange} />
       </Container>
+
+      </div>
+      
     );
   } else {
     if (props.done === true) {
