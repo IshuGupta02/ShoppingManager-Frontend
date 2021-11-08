@@ -148,12 +148,12 @@ function AllNotifications(props) {
       <Box className="flex-box">
             <ButtonGroup>
               <Button
-                href="./notif"
+                href="./history"
                 variant="outlined"
                 basic
                 startIcon={<CircleNotificationsIcon />}
               >
-                View Notifications
+                View History
               </Button>
               <Button
                 href="./cart"
@@ -174,7 +174,7 @@ function AllNotifications(props) {
               Logout
             </Button>
           </Box>
-          
+
         <Tabs value={value} onChange={handleChange} centered>
           <Tab label="Cart Updates" />
           <Tab label="Reminders" />
