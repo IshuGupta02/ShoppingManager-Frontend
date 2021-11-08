@@ -195,7 +195,7 @@ export class NotificationComponent extends React.Component {
                           this.setState({
                             notif_e_id: notif.id,
                             add_notif: notif.notif_content,
-                            notif_time: notif.notif_time.substring(0, 16),
+                            notif_time: notif.notif_time,
                           })
                         }
                       >
@@ -221,9 +221,10 @@ export class NotificationComponent extends React.Component {
                           color="text.primary"
                         >
                           {
-                            <Moment format="MMMM Do, h:mm a">
-                              {notif.notif_time}
-                            </Moment>
+                            // <Moment format="MMMM Do, h:mm a">
+                            //   {notif.notif_time}
+                            // </Moment>
+                            moment(notif.notif_time).format("MMMM Do, h:mm a")
                           }
                         </Typography>
                       </React.Fragment>
