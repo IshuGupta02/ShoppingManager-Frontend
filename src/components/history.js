@@ -119,7 +119,7 @@ class History extends React.Component {
                     </Feed.Date>
                     <Feed.Summary>
                     {
-                      JSON.parse(log.history_log).info +
+                      JSON.parse(log.history_log).info+
                       JSON.parse(log.history_log).object
                     }
                     </Feed.Summary>
