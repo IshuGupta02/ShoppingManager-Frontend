@@ -97,7 +97,7 @@ class History extends React.Component {
           </Button>
           <Confirm
             open={this.state.deletelog1}
-            onCancel={this.notDeleteLog1}
+            onCancel={()=>{this.notDeleteLog1()}}
             onConfirm={() => {
               this.deleteLog1();
             }}
@@ -211,7 +211,7 @@ class History extends React.Component {
     }
   }
 
-  notDeleteList = () => {
+  notDeleteLog = () => {
     this.setState({
       deletelog: false,
     });
@@ -253,7 +253,7 @@ class History extends React.Component {
     });
   }
 
-  notDeleteList1 = () => {
+  notDeleteLog1 = () => {
     this.setState({
       deletelog1: false,
     });
