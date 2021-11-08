@@ -7,7 +7,7 @@ import HomePage from "./components/home";
 import FormPage from "./components/form";
 import History from "./components/history";
 import Authenticate from "./components/authenticate.js";
-import Notification from "./components/notification.js";
+import AllNotifications from "./components/notification.js";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -107,7 +107,7 @@ function App(props) {
           path="/notif"
           render={(props) => {
             return (
-              <Notification
+              <AllNotifications
                 {...props}
                 loginStatus={loggedIn}
                 checkLoginStatus={checkLoginStatus}

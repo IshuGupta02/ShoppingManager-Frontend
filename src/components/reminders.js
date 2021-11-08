@@ -12,12 +12,12 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import axios from "axios";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Reminders from "./reminders.js";
-import Box from "@mui/material/Box";
+import Moment from "react-moment";
+import moment from "moment";
+import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
+import ButtonGroup from "@mui/material/ButtonGroup";
 
-function Notification(props) {
+function Reminders(props) {
   const [page, setPage] = React.useState(1);
   const [notifs, setNotifs] = React.useState(null);
   const [count, setCount] = React.useState(1);
@@ -28,7 +28,7 @@ function Notification(props) {
   };
   const getNotifs = async () => {
     const resp = await axios
-      .get(`http://127.0.0.1:8000/shopAPIs/notifs?page=${page}`, {
+      .get(`http://127.0.0.1:8000/shopAPIs/reminders?page=${page}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -60,19 +60,45 @@ function Notification(props) {
         {notifs !== null ? (
           !checkingNotifs ? (
             notifs.map((notif, index) => {
+              let currTime = moment(new Date());
+              let notif_tym = moment(notif.notif_time);
+              let bool_ = Math.abs(currTime.diff(notif_tym, "hours")) < 1;
+              console.log(currTime.diff(notif_tym, "hours"));
               return (
-                <Paper elevation={3} key={index} sx={{ mt: 0.5, mb: 0.5 }}>
+                <Paper
+                  elevation={3}
+                  key={index}
+                  sx={{
+                    mt: 0.5,
+                    mb: 0.5,
+                    borderBottom: bool_ ? "4px solid red" : "",
+                  }}
+                >
                   <ListItem
                     alignItems="flex-start"
                     secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="view site"
-                        color="secondary"
-                        href={notif.assoc_item.apiLink}
-                      >
-                        <ShoppingCartIcon />
-                      </IconButton>
+                      <ButtonGroup>
+                        {bool_ ? (
+                          <IconButton
+                            edge="end"
+                            aria-label="view site"
+                            color="primary"
+                            onClick={() => {
+                              props.history.push("/cart");
+                            }}
+                          >
+                            <ShoppingBasketIcon />
+                          </IconButton>
+                        ) : null}
+                        <IconButton
+                          edge="end"
+                          aria-label="view site"
+                          color="secondary"
+                          href={notif.assoc_item.apiLink}
+                        >
+                          <ShoppingCartIcon />
+                        </IconButton>
+                      </ButtonGroup>
                     }
                   >
                     <ListItemAvatar>
@@ -86,14 +112,25 @@ function Notification(props) {
                       secondary={
                         <React.Fragment>
                           <Typography
-                            sx={{ display: "inline" }}
+                            sx={{ fontSize: "14px", display: "inline" }}
                             component="span"
-                            variant="body2"
+                            variant="h6"
                             color="text.primary"
                           >
-                            {notif.ext_notif_info.concat(" status")}
+                            {notif.notif_content}
                           </Typography>
-                          {`— ${notif.ext_notif_content}`}
+                          —
+                          <Typography
+                            sx={{
+                              fontSize: "14px",
+                              color: bool_ ? "red" : "black",
+                            }}
+                            component="span"
+                          >
+                            <Moment format="MMMM Do, h:mm a">
+                              {notif.notif_time}
+                            </Moment>
+                          </Typography>
                         </React.Fragment>
                       }
                     />
@@ -119,24 +156,4 @@ function Notification(props) {
   }
 }
 
-function AllNotifications(props) {
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    console.log(newValue);
-    setValue(newValue);
-  };
-
-  return (
-    <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
-      <Container>
-        <Tabs value={value} onChange={handleChange} centered>
-          <Tab label="Cart Updates" />
-          <Tab label="Reminders" />
-        </Tabs>
-      </Container>
-      {value === 0 ? <Notification {...props} /> : <Reminders {...props} />}
-    </Box>
-  );
-}
-export default AllNotifications;
+export default Reminders;
