@@ -8,6 +8,7 @@
 # testing
 /coverage
 /src/constants/constants.js
+/src/components/itemUtils/bug.js
 # production
 /build
 

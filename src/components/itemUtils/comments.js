@@ -27,7 +27,7 @@ export class CommentComponent extends React.Component {
       add_comment: "",
       comments: this.props.comments,
     };
-  } 
+  }
   addComment = async (a) => {
     const data = {
       comment_content: a,
@@ -85,8 +85,8 @@ export class CommentComponent extends React.Component {
           })
           .then((res) => {
             this.props.fetchResponse();
-            for(let i = 0 ; i < this.props.comments.length ; i++){
-              if(this.props.comments[i].id===id){
+            for (let i = 0; i < this.props.comments.length; i++) {
+              if (this.props.comments[i].id === id) {
                 this.props.comments.splice(i, 1);
               }
             }
@@ -139,8 +139,8 @@ export class CommentComponent extends React.Component {
           .then((res) => {
             this.props.fetchResponse();
             this.getComments();
-            for(let i = 0 ; i < this.props.comments.length ; i++){
-              if(this.props.comments[i].id===id){
+            for (let i = 0; i < this.props.comments.length; i++) {
+              if (this.props.comments[i].id === id) {
                 this.props.comments.splice(i, 1);
               }
             }
@@ -160,9 +160,12 @@ export class CommentComponent extends React.Component {
       });
   };
   render() {
-    
-    {console.log(this.state.comments,this.props.comments)}
-    {console.log(this.state.comments,this.props.comments)}
+    {
+      console.log(this.state.comments, this.props.comments);
+    }
+    {
+      console.log(this.state.comments, this.props.comments);
+    }
     if (this.state.comments !== null || this.state.comments !== undefined) {
       return (
         <Dialog
@@ -172,9 +175,9 @@ export class CommentComponent extends React.Component {
           fullWidth
           scroll={"paper"}
           onClose={this.props.handleCommentClose}
-        > 
+        >
           <DialogTitle id="alert-dialog-title">Comments</DialogTitle>
-            <DialogContent>
+          <DialogContent>
             {this.props.comments.map((comment) => {
               return (
                 <Paper elevation={2} key={comment.id} sx={{ mt: 0.5, mb: 0.5 }}>
@@ -219,10 +222,10 @@ export class CommentComponent extends React.Component {
                   </ListItem>
                 </Paper>
               );
-            })}</DialogContent>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {this.props.comments.length === 0 ? "No Comments" : ""}
-          
+            })}
+          </DialogContent>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {this.props.comments.length === 0 ? "No Comments" : ""}
           <DialogContent>
             <TextField
               value={this.state.add_comment}
@@ -260,9 +263,14 @@ export class CommentComponent extends React.Component {
               </Button>
             )}
           </DialogContent>
-
           <DialogActions>
-            <Button onClick={()=>{this.props.handleCommentClose()}}>Close Menu</Button>
+            <Button
+              onClick={() => {
+                this.props.handleCommentClose();
+              }}
+            >
+              Close Menu
+            </Button>
           </DialogActions>
         </Dialog>
       );
