@@ -24,7 +24,10 @@ function Notification(props) {
       .get(`http://127.0.0.1:8000/shopAPIs/notifs?page=${page}`, {
         withCredentials: true,
       })
-      .then((res) => res.data)
+      .then((res) => {
+        console.log(res.data);
+        return res.data;
+      })
       .catch((err) => {
         console.log(err);
       });

@@ -1,35 +1,34 @@
 {
-  "manifest_version":2,
-  "name": "ShoppingManager",
-  "author":"ishu",
-  "version": "1.0.1",
+    "manifest_version": 2,
+    "name": "ShoppingManager",
+    "author": "ishu",
+    "version": "1.0.1",
 
-  "browser_action":{
-    "default_popup":"index.html",
-    "default_title": "Open the popup"
+    "browser_action": {
+        "default_popup": "index.html",
+        "default_title": "Open the popup"
 
-  },
+    },
 
-  "content_scripts": [
-    {
+    "content_scripts": [{
         "js": ["trial.js"],
         "matches": ["<all_urls>"]
-    }
-  ],
+    }],
 
-  "permissions": [
-    "cookies",
-    "desktopCapture",
-    "history",
-    "pageCapture",
-    "sessions",
-    "webRequest",
-    "storage",
-    "tabs",
-    "activeTab",
-    "http://*/*", 
-    "https://*/*"
-  ]
-  
-    
+    "permissions": [
+        "cookies",
+        "desktopCapture",
+        "history",
+        "pageCapture",
+        "sessions",
+        "webRequest",
+        "storage",
+        "tabs",
+        "activeTab",
+        "http://*/*",
+        "https://*/*"
+    ]
+
+
+
 }
